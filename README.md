@@ -53,11 +53,13 @@ Parameters:
 ### Model / CLIP / VAE Router
 Routers for switching between models, CLIP, and VAE. Support 6 to 30 inputs.
 
-<img src="https://github.com/Rimor-dev/my-assets_/blob/main/routers.png" alt="main" width="20%">
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/routers.png" alt="main" width="40%">
 
 ## Installation
 
 Recommended installation method is via AKA (a shell manager for ComfyUI).
+
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/aka___.png" alt="main" width="40%">
 
 Manual installation:
 
@@ -71,6 +73,9 @@ Restart ComfyUI
 ```
 
 ### Workflow Setup
+
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/wfw.png" alt="main" width="40%">
+
 The example_workflows folder contains a sample workflow with four parallel sampling branches (A, B, C, D).
 
 The workflow uses multiple models. You can replace them with any other models available on your system. To do this, open the nested model groups and specify your own model paths.
