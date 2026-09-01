@@ -1,4 +1,3 @@
-markdown
 # ComfyUI-CFG-Sculptor
 
 An experimental node pack for ComfyUI with dynamic CFG sculpting.
@@ -27,6 +26,8 @@ The primary goal is experimentation. This sampler was created as a tool for expl
 ### CFG Sculptor Advanced
 The main sampling node with dynamic CFG.
 
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/Sculptor.png" alt="main" width="20%">
+
 Parameters:
 - Preset — selection from 10 presets
 - CFG Range — start and end CFG values
@@ -37,9 +38,12 @@ Parameters:
 
 ### Preview
 Node for displaying real-time sampling preview.
+Credits to Kijai for the reference node that helped understand how to create a standalone preview node.
 
 ### SimKarr Scheduler
 Hybrid scheduler combining Simple and Karras.
+
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/Simkarr.png" alt="main" width="20%">
 
 Parameters:
 - Mode — simple_karras or karras_simple
@@ -48,6 +52,8 @@ Parameters:
 
 ### Model / CLIP / VAE Router
 Routers for switching between models, CLIP, and VAE. Support 6 to 30 inputs.
+
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/routers.png" alt="main" width="20%">
 
 ## Installation
 
@@ -64,21 +70,21 @@ git clone https://github.com/Rimor/ComfyUI-CFG-Sculptor
 Restart ComfyUI
 ```
 
-Workflow Setup
+### Workflow Setup
 The example_workflows folder contains a sample workflow with four parallel sampling branches (A, B, C, D).
 
 The workflow uses multiple models. You can replace them with any other models available on your system. To do this, open the nested model groups and specify your own model paths.
 
 The main model selection parameter is active_channel in the routers. Switching the channel allows you to quickly change the model, CLIP, and VAE for all branches simultaneously.
 
-Dependencies
+### Dependencies
 ComfyUI (recent version with comfy_api support)
 
 torch
 
 numpy
 
-License
+### License
 MIT
 
 Happy experimenting! May every CFG curve lead to unexpected and interesting results.
