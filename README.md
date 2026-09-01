@@ -40,6 +40,8 @@ Parameters:
 Node for displaying real-time sampling preview.
 Credits to Kijai for the reference node that helped understand how to create a standalone preview node.
 
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/prevw.png" alt="main" width="20%">
+
 ### SimKarr Scheduler
 Hybrid scheduler combining Simple and Karras.
 
