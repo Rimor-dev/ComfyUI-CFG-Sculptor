@@ -2,6 +2,8 @@
 
 An experimental node pack for ComfyUI with dynamic CFG sculpting.
 
+<img src="https://github.com/Rimor-dev/my-assets_/blob/main/prime.png" alt="main" width="70%">
+
 ## Description
 
 CFG Sculptor provides a flexible tool for controlling CFG during the sampling process. Instead of a static CFG value, you can build complex curves: envelopes, waveforms, hysteresis, and snapshots at different stages of generation.
