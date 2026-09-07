@@ -91,22 +91,6 @@ PRESETS = {
 }
 
 
-# ===== ФУНКЦИЯ ЛОГИРОВАНИЯ =====
-def get_log_file(unique_id):
-    node_dir = os.path.dirname(os.path.abspath(__file__))
-    log_dir = os.path.join(node_dir, "logs")
-    os.makedirs(log_dir, exist_ok=True)
-    return os.path.join(log_dir, f"cfg_sculptor_{unique_id}.log")
-
-def log_to_file(log_file, msg):
-    with open(log_file, 'a', encoding='utf-8') as f:
-        f.write(msg + '\n')
-
-def log_debug(log_file, msg):
-    log_to_file(log_file, msg)
-    print(msg, flush=True)
-
-
 class CFGSculptorAdvanced(io.ComfyNode):
     RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE", "IMAGE")
     RETURN_NAMES = ("Snapshot 1", "Snapshot 2", "Snapshot 3", "Final Image")
@@ -191,13 +175,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
                 unique_id = CFGSculptorAdvanced._node_counter
                 CFGSculptorAdvanced._node_counter += 1
         
-        log_file = get_log_file(unique_id)
-        
-        with open(log_file, 'w', encoding='utf-8') as f:
-            f.write(f"=== CFG Sculptor Log - Node {unique_id} ===\n")
-        
-        log_debug(log_file, f"[DEBUG] Node ID: {unique_id}")
-        
         # Default значения
         if preset is None: preset = "custom"
         if cfg_start is None: cfg_start = "2.0"
@@ -222,7 +199,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
         cfg_end = float(cfg_end)
         use_envelope = use_envelope.lower() == "true"
         wave_amplitude = float(wave_amplitude)
-        # ВАЖНО: Ограничиваем wave_amplitude до 1.0
         wave_amplitude = min(wave_amplitude, 1.0)
         wave_amplitude = max(wave_amplitude, 0.0)
         wave_periods = float(wave_periods)
@@ -248,7 +224,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
             wave_decay = p["wave_decay"]
             hysteresis_enabled = p["hysteresis_enabled"]
             hysteresis_factor = p["hysteresis_factor"]
-            log_debug(log_file, f"[Rimor] Preset: {preset}")
         
         cfg_floor = min(cfg_start, cfg_end)
         cfg_ceiling = max(cfg_start, cfg_end)
@@ -273,25 +248,12 @@ class CFGSculptorAdvanced(io.ComfyNode):
         cfg_range = abs(cfg_start - cfg_end)
         wave_amplitude_abs = cfg_range * wave_amplitude
         
-        log_debug(log_file, f"=== WAVE PARAMETERS ===")
-        log_debug(log_file, f"cfg_start={cfg_start}, cfg_end={cfg_end}")
-        log_debug(log_file, f"cfg_range={cfg_range}, cfg_floor={cfg_floor}, cfg_ceiling={cfg_ceiling}")
-        log_debug(log_file, f"waveform={waveform}")
-        log_debug(log_file, f"wave_amplitude={wave_amplitude} (множитель)")
-        log_debug(log_file, f"wave_amplitude_abs={wave_amplitude_abs}")
-        log_debug(log_file, f"wave_periods={wave_periods}")
-        log_debug(log_file, f"wave_decay={wave_decay}")
-        log_debug(log_file, f"use_envelope={use_envelope}, envelope_mode={envelope_mode}")
-        log_debug(log_file, f"hysteresis_enabled={hysteresis_enabled}, factor={hysteresis_factor}")
-        log_debug(log_file, f"========================")
-        
         def calculate_cfg(step, total_steps):
             if total_steps <= 1:
                 return max(cfg_floor, cfg_start)
             
             t = step / max(total_steps - 1, 1)
             
-            # Базовая огибающая
             if use_envelope:
                 if envelope_mode == "fibonacci":
                     base = calc_fibonacci_envelope(t, cfg_start, cfg_end)
@@ -301,16 +263,10 @@ class CFGSculptorAdvanced(io.ComfyNode):
             else:
                 base = cfg_start + (cfg_end - cfg_start) * t
             
-            # Волна
             wave = calc_waveform(t, waveform, wave_periods, wave_amplitude_abs, wave_decay)
             
             result = base + wave
             result = max(cfg_floor, min(result, cfg_ceiling))
-            
-            log_to_file(log_file, 
-                f"step={step:3d}/{total_steps} | t={t:.4f} | "
-                f"base={base:.3f} | wave={wave:+.3f} | "
-                f"result={result:.3f} | floor={cfg_floor:.3f} | ceiling={cfg_ceiling:.3f}")
             
             return result
         
@@ -337,7 +293,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
                         self.snap_steps.add(step)
             
             def find_step_idx(self, sigma):
-                # Если уже на последнем шаге - не идём дальше
                 if self._last_step_idx >= self.total_steps - 1:
                     return self.total_steps - 1
                 
@@ -354,7 +309,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
                         min_idx = diffs.index(min(diffs))
                         result = valid_indices[min_idx]
                 
-                # Не даём шагу повторяться
                 if result <= self._last_step_idx:
                     result = self._last_step_idx + 1
                 
@@ -400,7 +354,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
                 
                 if step_idx in self.snap_steps and step_idx not in self.snapshot_latents:
                     self.snapshot_latents[step_idx] = result.clone()
-                    log_debug(log_file, f"SNAPSHOT at step {step_idx}")
                 
                 return result
         
@@ -465,14 +418,6 @@ class CFGSculptorAdvanced(io.ComfyNode):
         if snap2_enabled and snap2_img is None: snap2_img = final_image
         if snap3_enabled and snap3_img is None: snap3_img = final_image
         
-        caught = list(guider.snapshot_latents.keys())
-        log_debug(log_file, f"Snapshots caught: {caught}")
-        
-        if guider.cfg_history:
-            log_debug(log_file, f"CFG range: {min(guider.cfg_history):.3f} - {max(guider.cfg_history):.3f}")
-        else:
-            log_debug(log_file, "CFG history is empty")
-        
         return io.NodeOutput(snap1_img, snap2_img, snap3_img, final_image)
 
     sample = execute
@@ -528,11 +473,9 @@ def calc_fibonacci_envelope(t, start, end, fib_depth=8):
     floor = min(start, end)
     ceiling = max(start, end)
     
-    # Гарантируем что t=1.0 даёт end
     if t >= 1.0:
         return end
     
-    # Гарантируем что t=0.0 даёт start
     if t <= 0.0:
         return start
     
