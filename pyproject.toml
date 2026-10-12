@@ -1,15 +1,19 @@
 [project]
-name = "ComfyUI-CFG-Sculptor"
+name = "cfg-sculptor"
 description = "Dynamic CFG sculpting with envelopes, waveforms, hysteresis, and snapshots"
 version = "1.0.0"
 license = {text = "MIT"}
 authors = [{name = "Rimor"}]
 readme = "README.md"
 requires-python = ">=3.10"
-
-[dependencies]
-torch = "*"
-numpy = "*"
+dependencies = [
+    "torch",
+    "numpy",
+]
 
 [project.urls]
-Repository = "https://github.com/Rimor-dev/ComfyUI-CFG-Sculptor.git"
+Repository = "https://github.com/Rimor-dev/ComfyUI-CFG-Sculptor"
+
+[tool.comfy]
+PublisherId = "rimor"
+DisplayName = "CFG Sculptor"
